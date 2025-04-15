@@ -1039,68 +1039,6 @@ PRIORITY可以是字符?A、?B或?C之一。"
   :bind ("<f3>" . highlight-symbol)) ;; 按下 F3 键就可高亮当前符号
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; 配置 indent-guides ;;;;;;;;;;;;;;;;;
-
-(add-hook 'prog-mode-hook
-          #'(lambda ()
-             (require 'highlight-indent-guides)
-             (setq highlight-indent-guides-method 'character)
-             (setq highlight-indent-guides-auto-enabled t)
-             ;; 设置响应模式，当光标移动到引导线上时触发响应
-             (setq highlight-indent-guides-responsive 'top)
-             (highlight-indent-guides-mode)))
-
-(custom-set-faces
- '(highlight-indent-guides-character-face ((t (:foreground "blue")))))
-
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
-
-(defun adjust-languages-indent (n)
-  (setq-local c-basic-offset n)
-
-  (setq-local coffee-tab-width n)
-  (setq-local javascript-indent-level n)
-  (setq-local js-indent-level n)
-  (setq-local js2-basic-offset n)
-
-  (setq-local web-mode-attr-indent-offset n)
-  (setq-local web-mode-attr-value-indent-offset n)
-  (setq-local web-mode-code-indent-offset n)
-  (setq-local web-mode-css-indent-offset n)
-  (setq-local web-mode-markup-indent-offset n)
-  (setq-local web-mode-sql-indent-offset n)
-
-  (setq-local css-indent-offset n))
-
-(dolist (hook (list
-               'c-mode-hook
-               'c++-mode-hook
-               'java-mode-hook
-               'haskell-mode-hook
-               'asm-mode-hook
-               'sh-mode-hook
-               'haskell-cabal-mode-hook
-               'ruby-mode-hook
-               'qml-mode-hook
-               'scss-mode-hook
-               'coffee-mode-hook
-               ))
-  (add-hook hook #'(lambda ()
-                     (setq indent-tabs-mode nil)
-                     (adjust-languages-indent 4)
-                     )))
-
-(dolist (hook (list
-               'web-mode-hook
-               'js-mode-hook
-               ))
-  (add-hook hook #'(lambda ()
-                     (setq indent-tabs-mode nil)
-                     (adjust-languages-indent 2)
-                     )))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; 配置 dashboard ;;;;;;;;;;;;;;;;;;;
 
  (use-package dashboard
