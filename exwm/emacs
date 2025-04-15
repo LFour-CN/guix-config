@@ -404,18 +404,6 @@
   (vterm-buffer-name-string "vterm %s"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;; 配置 quickrun ;;;;;;;;;;;;;;;;;;;
-
-(use-package quickrun
-  :config
-  (with-eval-after-load 'evil
-    (evil-set-initial-state 'quickrun--mode 'emacs))
-  (quickrun-add-command "c++/clang++"
-    '((:exec . ("%c -std=c++14 -x c++ %o -o %e %s" "%e %a")))
-    :override t)
-  :bind ("C-c r" . quickrun))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 配置 rainbow-delimiters ;;;;;;;;;;;
 
 (use-package rainbow-delimiters
@@ -545,174 +533,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; 配置 org 模式 ;;;;;;;;;;;;;;;
-
-;; 基本路径和变量设置
-(setq org-directory (file-truename "~/org/"))
-(setq pv/org-agenda-files `(,(concat org-directory "Agenda/")))
-;;(setq pv/org-refile-file (concat org-directory "refile.org"))
-(setq pv/org-bibtex-library `(,(concat org-directory "References/")))
-(setq pv/org-bibtex-files `(,(concat org-directory "References/references.bib")))
-
-;; 加载org-mode相关配置
-(use-package org
-  :init
-  (require 'org-indent)
-  :config
-  ;; 初始化钩子函数
-  (defun pv/init-org-hook ()
-    (setq truncate-lines nil)
-    (org-toggle-pretty-entities)) ; 显示LaTeX符号
-  ;; 跳过指定优先级子树的函数
-  (defun pv/org-skip-subtree-if-priority (priority)
-    "如果议程子树的优先级为PRIORITY，则跳过该子树。
-PRIORITY可以是字符?A、?B或?C之一。"
-    (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-          (pri-value (* 1000 (- org-lowest-priority priority)))
-          (pri-current (org-get-priority (thing-at-point 'line t))))
-      (if (= pri-value pri-current)
-          subtree-end
-        nil)))
-  ;; 跳过习惯相关子树的函数
-  (defun pv/org-skip-subtree-if-habit ()
-    "如果议程条目具有等于“habit”的STYLE属性，则跳过该条目。"
-    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-      (if (string= (org-entry-get nil "STYLE") "habit")
-          subtree-end
-        nil)))
-  :hook
-  (org-mode . pv/init-org-hook)
-  :custom
-  ;; 显示相关设置
-  (org-hide-leading-stars t "更清晰的显示方式")
-  (org-startup-with-inline-images t "始终显示内联图像")
-  (org-image-actual-width 600 "设置显示图像时的宽度")
-  (org-outline-path-complete-in-steps nil)
-  ;; 待办事项相关设置
-  (org-todo-keywords
-   (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-           (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)" "MEETING"))))
-  (org-todo-keyword-faces
-   (quote (("TODO" :foreground "goldenrod1" :weight bold)
-           ("NEXT" :foreground "DodgerBlue1" :weight bold)
-           ("DONE" :foreground "SpringGreen2" :weight bold)
-           ("WAITING" :foreground "LightSalmon1" :weight bold)
-           ("CANCELLED" :foreground "LavenderBlush4" :weight bold)
-           ("MEETING" :foreground "IndianRed1" :weight bold))))
-  (org-todo-state-tags-triggers
-   (quote (("CANCELLED" ("CANCELLED" . t))
-           ("WAITING" ("WAITING" . t))
-           (done ("WAITING"))
-           ("TODO" ("WAITING") ("CANCELLED"))
-           ("NEXT" ("WAITING") ("CANCELLED"))
-           ("DONE" ("WAITING") ("CANCELLED")))))
-  (org-adapt-indentation t)
-  ;; 议程相关设置
-  (org-agenda-files pv/org-agenda-files)
-  (org-agenda-dim-blocked-tasks nil)
-  (org-agenda-compact-blocks t)
-  (org-agenda-span 7)
-  (org-agenda-start-day "-2d")
-  (org-agenda-start-on-weekday nil)
-  (org-agenda-tags-column -86) ; 默认值自动设置有问题
-  ;; 自定义议程命令定义
-  (org-agenda-custom-commands
-   (quote (("d" "每日议程和所有待办事项"
-            ((tags "PRIORITY=\"A\""
-                   ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                    (org-agenda-overriding-header "高优先级未完成任务:")))
-             (agenda "" ((org-agenda-ndays 1)))
-             (alltodo ""
-                      ((org-agenda-skip-function '(or (pv/org-skip-subtree-if-habit)
-                                                      (pv/org-skip-subtree-if-priority ?A)
-                                                      (org-agenda-skip-if nil '(scheduled deadline))))
-                       (org-agenda-overriding-header "所有普通优先级任务:"))))
-            ((org-agenda-compact-blocks t)))
-           ("p" "项目"
-            ((agenda "" nil)
-             (tags "REFILE"
-                   ((org-agenda-overriding-header "待重新归档的任务")
-                    (org-tags-match-list-sublevels nil)))
-             (tags-todo "-CANCELLED/!"
-                        ((org-agenda-overriding-header "停滞项目")
-                         (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-                         (org-agenda-sorting-strategy
-                          '(category-keep))))
-             (tags-todo "-CANCELLED/!NEXT"
-                        ((org-agenda-overriding-header (concat "项目下一步任务"
-                                                               (if bh/hide-scheduled-and-waiting-next-tasks
-                                                                   ""
-                                                                   " (包括WAITING和SCHEDULED任务)")))
-                         (org-agenda-skip-function 'bh/skip-projects-and-habits-and-single-tasks)
-                         (org-tags-match-list-sublevels t)
-                         (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-                         (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-                         (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
-                         (org-agenda-sorting-strategy
-                          '(todo-state-down effort-up category-keep))))
-             (tags "-REFILE/"
-                   ((org-agenda-overriding-header "待归档任务")
-                    (org-agenda-skip-function 'bh/skip-non-archivable-tasks)
-                    (org-tags-match-list-sublevels nil))))
-            nil))))
-  :bind
-  (("C-c a" . 'org-agenda)
-   ("C-c c" . 'org-capture)
-   :map org-mode-map
-   ("C-c C-q" . counsel-org-tag)))
-
-;; org-roam配置
-(use-package org-roam
-   :ensure t
-   :after org
-   :init
-   (setq org-roam-v2-ack t) ;; Acknowledge V2 upgrade
-   :config
-   (org-roam-setup)
-   :custom
-   (org-roam-directory (concat org-directory "roam/")) ; 设置 org-roam 目录
-   :bind
-   (("C-c n f" . org-roam-node-find)
-    (:map org-mode-map
-          (("C-c n i" . org-roam-node-insert)
-           ("C-c n o" . org-id-get-create)
-           ("C-c n t" . org-roam-tag-add)
-           ("C-c n a" . org-roam-alias-add)
-           ("C-c n l" . org-roam-buffer-toggle)))))
-
-;; bibtex-completion配置
-(use-package bibtex-completion
-  :custom
-  (bibtex-completion-pdf-open-function
-   (lambda (fpath)
-     (call-process "open" nil 0 nil fpath))) ; 配置打开PDF的方式
-  (bibtex-completion-bibliography pv/org-bibtex-files)
-  (bibtex-completion-library-path pv/org-bibtex-library))
-
-;; org-ref配置
-;;(use-package org-ref
-;;  :ensure t)
-
-;; org-mode捕获和引用相关配置
-;;(use-package org
-;;  :custom
-;;  (org-capture-templates
-;;   (quote (("t" "todo" entry (file pv/org-refile-file)
-;;            "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
-;;           ("r" "respond" entry (file pv/org-refile-file)
-;;            "* NEXT Respond to %:from on %:subject\nSCHEDULED: %t\n%U\n%a\n" :clock-in t :clock-resume t :immediate-finish t)
-;;           ("n" "note" entry (file pv/org-refile-file)
-;;            "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
-;;           ("w" "org-protocol" entry (file pv/org-refile-file)
-;;            "* TODO Review %c\n%U\n" :immediate-finish t)
-;;           ("m" "Meeting" entry (file pv/org-refile-file)
-;;            "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t))))
-;;  (org-refile-targets (quote ((nil :maxlevel . 9)
-;;                             (org-agenda-files :maxlevel . 9))))
-;;  ;; 使用完整的大纲路径作为重新归档目标 - 我们直接使用IDO进行归档
-;;  (org-refile-use-outline-path 'file)
-;;  ;; 允许重新归档时确认创建父任务
-;;  (org-refile-allow-creating-parent-nodes (quote confirm))
-;;  (org-cite-global-bibliography pv/org-bibtex-files))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;; 配置 vertico ;;;;;;;;;;;;;;;;;;
@@ -869,15 +689,6 @@ PRIORITY可以是字符?A、?B或?C之一。"
   :bind (("C-c g" . magit-status)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; 配置 breadcrumb ;;;;;;;;;;;;;;;;;;;;
-
-(use-package breadcrumb
-  :vc (:fetcher github :repo joaotavora/breadcrumb)
-  :init
-  ;; 启用 breadcrumb 模式
-  (breadcrumb-mode))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 配置 paredit ;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package paredit
@@ -887,17 +698,6 @@ PRIORITY可以是字符?A、?B或?C之一。"
          (ielm-mode . enable-paredit-mode)
          (lisp-interaction-mode . enable-paredit-mode)
          (scheme-mode . enable-paredit-mode)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; 配置 C-mode ;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package c++-mode
-  :functions 			; suppress warnings
-  c-toggle-hungry-state
-  :hook
-  (c-mode . lsp-deferred)
-  (c++-mode . lsp-deferred)
-  (c++-mode . c-toggle-hungry-state))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 配置 elixir-mode ;;;;;;;;;;;;;;;;;
