@@ -112,10 +112,19 @@
 ;;;;;;;;;;;;;;;; EXWM ;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package exwm
-  :ensure t
-  :config
-(exwm-config-default)
-)
+    :init
+    :config
+(setq exwm-workspace-show-all-buffers t)
+(setq exwm-layout-show-all-buffers t)
+(add-hook 'exwm-update-class-hook
+(lambda ()
+(exwm-workspace-rename-buffer exwm-class-name)))
+(with-eval-after-load 'evil
+(evil-set-initial-state 'exwm-mode 'motion))
+;; do not forward anything besides keys defined with
+;; `exwm-input-set-key' and `exwm-mode-map'
+(setq exwm-input-prefix-keys '())
+(exwm-enable))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; powerline ;;;;;;;;;;;;;;;;;
@@ -910,11 +919,6 @@
   :after yasnippet)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;; 配置 dap-mode ;;;;;;;;;;;;;;;;;;;;
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; 配置 projectile ;;;;;;;;;;;;;;;;;;
 
 (use-package projectile
@@ -928,17 +932,6 @@
   :ensure t
   :after (projectile)
   :init (counsel-projectile-mode))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;; 配置 lldb-dap ;;;;;;;;;;;;;;;;;;;;;
-
-(use-package dap-lldb
-  :after dap-mode
-  :custom
-  (dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
-  ;; ask user for executable to debug if not specified explicitly (c++)
-  (dap-lldb-debugged-program-function
-    (lambda () (read-file-name "Select file to debug: "))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
