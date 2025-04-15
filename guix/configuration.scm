@@ -4,9 +4,14 @@
              (gnu services)
              (gnu services guix)
              (gnu packages)
-             (srfi srfi-1))
+             (srfi srfi-1)
+             (nongnu packages linux)
+             (nongnu system linux-initrd))
 
 (operating-system
+  (kernel linux)
+  (initrd microcode-initrd)
+  (firmware (list linux-firmware))
   (locale "en_US.utf8")
   (timezone "Asia/Shanghai")
   (keyboard-layout (keyboard-layout "us"))
@@ -32,6 +37,10 @@
                    "2A39 3FFF 68F4 EF7A 3D29 12AF 6F51 20A0 22F8 B2D5"))))
               %base-channels
             ))
+
+  ;; Firmware
+  (firmware (cons* iwlwifi-firmware
+                 %base-firmware))
 
   ;; Packages
   (packages (append (list
