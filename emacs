@@ -9,12 +9,7 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-  
-;; 检查并安装 vc-use-package 包
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-(require 'vc-use-package)
-  
+    
 ;; Initialize use-package on non-Linux platforms
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
@@ -37,36 +32,36 @@
 (setq visible-bell t)
   
 ;; EXWM
-(require 'exwm)
-(require 'exwm-config)
+(use-package 'exwm
+  :ensure t
+  )
+(use-package 'exwm-config
+  :ensure t
+  )
 (exwm-config-default)
 
-;; Load the system tray before exwm-init
-(require 'exwm-systemtray)
+(use-package  'exwm-systemtray
+  :ensure t
+)
 (exwm-systemtray-mode 1)
-
-;; Ensure screen updates with xrandr will refresh EXWM frames
-(require 'exwm-randr)
-(exwm-randr-enable)
-;; Set the screen resolution
-(start-process-shell-command "xrandr" nil "")
 
 (setq inhibit-startup-screen t)
 (setq inhibit-splash-screen t)
 
 ;; powerline
+(use-package 'powerline
+  :ensure t
+  )
 (powerline-default-theme)
 
 ;; pyim
-(require 'pyim)
-(setq default-input-method "pyim")
-(setq pyim-page-tooltip 'posframe)
-(setq pyim-default-scheme 'quanpin)
-(global-set-key (kbd "C-\\") 'toggle-input-method)
-
-(require 'exwm-xim)
-(exwm-xim-enable)
-(push ?\C-\\ exwm-input-prefix-keys)   ;; Use "Ctrl + \" to change inputs
+(use-package 'pyim
+  :ensure t
+  :config
+  (setq default-input-method "pyim")
+  (setq pyim-page-tooltip 'posframe)
+  (setq pyim-default-scheme 'quanpin)
+  (global-set-key (kbd "C-\\") 'toggle-input-method))
 
 ;; 设置垃圾回收阈值，避免频繁的垃圾回收影响性能
 (defun max-gc-limit ()
