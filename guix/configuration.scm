@@ -6,7 +6,9 @@
              (gnu packages)
              (srfi srfi-1)
              (nongnu packages linux)
-             (nongnu system linux-initrd))
+             (nongnu system linux-initrd)
+             (nongnu packages nvidia)  ; NVIDIA packgae module
+             (nongnu services nvidia)) ; NVIDIA service module
 
 (operating-system
   (kernel linux)
@@ -49,28 +51,35 @@
                      (pkg "nss-certs")
                      (pkg "xorg")
                      (pkg "network-manager")
+                     (pkg "nvda") ; add nvda package
                     )
                     %base-packages))
 
   ;; System services
   (services (modify-services %desktop-services
   
-    ;; 1. CUPS print
-    (cups-service-type config => (cons* (service cups-service-type) config))
+   ;; 1. CUPS print
+   (cups-service-type config => (cons* (service cups-service-type) config))
     
-    ;; 2. Xorg layout
-    (xorg-service-type config => (cons* (service xorg-service-type
+   ;; 2. Xorg layout
+   (xorg-service-type config => (cons* (service xorg-service-type
                                                   (xorg-configuration
-                                                   (keyboard-layout keyboard-layout)))
+                                                   (keyboard-layout keyboard-layout)
+                                                   (modules (cons nvda %default-xorg-modules)) ; add nvda module
+                                                   (drivers '("nvidia")))) ; use nvidia driver
                                          config))
     
-    ;; 3. Substitute
-    (guix-service-type config =>
+   ;; 3. Substitute
+   (guix-service-type config =>
       (service guix-service-type
                (guix-configuration
                 (inherit config)
                 (substitute-urls '("https://mirror.sjtu.edu.cn/guix/"
                                    "https://ci.guix.gnu.org")))))
+
+   ;; NVIDIA service
+   (nvidia-service-type config => (cons* (service nvidia-service-type) config))
+  
   ))
 
   ;; Grub
