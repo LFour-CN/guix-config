@@ -139,6 +139,31 @@
   (eaf-bind-key take_photo "p" eaf-camera-keybinding)
   (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
 
+;; Load applications
+(require 'eaf-browser)
+(require 'eaf-pdf-viewer)
+(require 'eaf-html-email-renderer)
+(require 'eaf-video-player)
+(require 'eaf-image-viewer)
+(require 'eaf-markdown-previewer)
+(require 'eaf-org-previewer)
+(require 'eaf-camera)
+(require 'eaf-terminal)
+(require 'eaf-file-manager)
+(require 'eaf-git-client)
+(require 'eaf-map-route-planning)
+(require 'eaf-file-sender)
+(require 'eaf-file-browser)
+(require 'eaf-airshare)
+(require 'eaf-markmap)
+(require 'eaf-mindmap)
+(require 'eaf-ms-office-viewer)
+(require 'eaf-jupyter)
+(require 'eaf-music-player)
+(require 'eaf-system-monitor)
+(require 'eaf-demo)
+(require 'eaf-vue-demo)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; powerline ;;;;;;;;;;;;;;;;;
 
@@ -618,7 +643,7 @@
 (use-package highlight-symbol
   :ensure t
   :init (highlight-symbol-mode)
-  :bind ("<f3>" . highlight-symbol)) ;; 按下 F3 键就可高亮当前符号
+  :bind ("<f6>" . highlight-symbol)) ;; 按下 F6 键就可高亮当前符号
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 配置 indent-guides ;;;;;;;;;;;;;;;;;
@@ -656,8 +681,6 @@
   (setq-local css-indent-offset n))
 
 (dolist (hook (list
-               'c-mode-hook
-               'c++-mode-hook
                'java-mode-hook
                'haskell-mode-hook
                'asm-mode-hook
