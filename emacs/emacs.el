@@ -674,17 +674,6 @@ PRIORITY可以是字符?A、?B或?C之一。"
          (scheme-mode . enable-paredit-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; 配置 C-mode ;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package c++-mode
-  :functions 			; suppress warnings
-  c-toggle-hungry-state
-  :hook
-  (c-mode . lsp-deferred)
-  (c++-mode . lsp-deferred)
-  (c++-mode . c-toggle-hungry-state))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 配置 elixir-mode ;;;;;;;;;;;;;;;;;
 
 (use-package elixir-mode
