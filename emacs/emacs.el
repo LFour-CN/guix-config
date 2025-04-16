@@ -202,9 +202,9 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; 配置 all-the-icon ;;;;;;;;;;;
+;;;;;;; 配置 all-the-icons ;;;;;;;;;;;
 
-(use-package all-the-icon
+(use-package all-the-icons
   :ensure t
 )
 
