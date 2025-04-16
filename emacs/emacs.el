@@ -658,7 +658,6 @@ PRIORITY可以是字符?A、?B或?C之一。"
 ;;;;;;; 配置 breadcrumb ;;;;;;;;;;;;;;;;;;;;
 
 (use-package breadcrumb
-  :vc (:fetcher github :repo joaotavora/breadcrumb)
   :init
   ;; 启用 breadcrumb 模式
   (breadcrumb-mode))
