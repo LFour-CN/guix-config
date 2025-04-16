@@ -202,6 +202,13 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; 配置 all-the-icon ;;;;;;;;;;;
+
+(use-package all-the-icon
+  :ensure t
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 配置 sr-speedbar ;;;;;;;;;;;;;;;;;
 
 (use-package sr-speedbar
@@ -953,7 +960,9 @@ PRIORITY可以是字符?A、?B或?C之一。"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; 配置 dap-mode ;;;;;;;;;;;;;;;;;;;;
 
-
+(use-package dap-mode
+  :ensure t
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; 配置 projectile ;;;;;;;;;;;;;;;;;;
@@ -969,19 +978,6 @@ PRIORITY可以是字符?A、?B或?C之一。"
   :ensure t
   :after (projectile)
   :init (counsel-projectile-mode))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;; 配置 lldb-dap ;;;;;;;;;;;;;;;;;;;;;
-
-(use-package dap-lldb
-  :after dap-mode
-  :custom
-  (dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
-  ;; ask user for executable to debug if not specified explicitly (c++)
-  (dap-lldb-debugged-program-function
-    (lambda () (read-file-name "Select file to debug: "))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; 配置快捷键 ;;;;;;;;;;;;;;;;;;;;;;;
