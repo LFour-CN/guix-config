@@ -1,17 +1,10 @@
-;;; config: EXWM --- 2025-4-16
-;;; LFour-CN@github
-;;; Code:
 (require 'package)
-(setq package-archives
-      '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-        ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-        ("gnu-devel" . "https://elpa.gnu.org/devel/")
-        ("elpa" . "https://elpa.gnu.org/packages/")
-        ("nongnu-devel" . "https://elpa.nongnu.org/nongnu-devel/")))
+(add-to-list 'package-archives '("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") t)
+(add-to-list 'package-archives '("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-    
+
 ;; Initialize use-package on non-Linux platforms
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
