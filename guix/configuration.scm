@@ -8,7 +8,10 @@
              (nongnu packages linux)
              (nongnu system linux-initrd)
              (nongnu packages nvidia)  ; NVIDIA packgae module
-             (nongnu services nvidia)) ; NVIDIA service module
+             (nongnu services nvidia) ; NVIDIA service module
+             (modules system channels)
+             (modules system systempkgs)
+             (modules user usepkgs))
 
 (operating-system
   (kernel linux)
@@ -28,32 +31,14 @@
                %base-user-accounts))
   
   ;; Channels
-  (channels (cons*
-              (channel
-                (name 'nonguix)
-                (url "https://gitlab.com/nonguix/nonguix")
-                (introduction
-                 (make-channel-introduction
-                  "897c1a470da759236cc11798f4e0a5f7d4d59fbc"
-                  (openpgp-fingerprint
-                   "2A39 3FFF 68F4 EF7A 3D29 12AF 6F51 20A0 22F8 B2D5"))))
-              %base-channels
-            ))
+  (channels my-channels)
 
   ;; Firmware
   (firmware (cons* iwlwifi-firmware
                  %base-firmware))
 
   ;; Packages
-  (packages (append (list
-                     (pkg "emacs")
-                     (pkg "emacs-exwm")
-                     (pkg "nss-certs")
-                     (pkg "xorg")
-                     (pkg "network-manager")
-                     (pkg "nvda") ; add nvda package
-                    )
-                    %base-packages))
+  (packages my-system-packages)
 
   ;; System services
   (services (modify-services %desktop-services
